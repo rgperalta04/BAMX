@@ -72,32 +72,12 @@ body{
     font-size: 1.7rem;
 }
 
-.iconos {
-    width: 200px;
-    display: flex;
-    justify-content: space-around;
-    margin: auto;
+.cuenta_gratis{
+    padding: 2rem 0;
+    margin-bottom: 1.5rem;
 }
 
-.border_icon {
-    height: 20px;
-    width: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem;
-    border: solid thin white;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    transition: all .3s ease-in;
-}
-
-.border_icon:hover {
-    background-color: #4a4aee;
-    cursor: pointer;
-}
-
-.Cuenta_gratis {
+.espacio_inicio_sesion {
     padding: 2rem 0;
 }
 
@@ -113,21 +93,28 @@ body{
     outline: none;
     padding: .2rem 0;
     font-size: .9rem;
-    color: rgb(0, 0, 0);
+    color: black;
 }
 
-.formulario input[type="button"] {
+.formulario input[type="text"]::placeholder,
+.formulario input[type="email"]::placeholder,
+.formulario input[type="password"]::placeholder
+{
+    color:black;
+}
+
+.formulario input[type="submit"] {
     width: 60%;
     margin: auto;
     border: solid thin white;
     padding: .7rem;
     border-radius: 2rem;
+    color: black;
     background-color: brown;
     font-weight: 600;
     margin-top: 3rem;
     font-size: .8rem;
     cursor: pointer;
-    color: #222;
 }
 
 .sign_in {
