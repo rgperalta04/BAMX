@@ -39,24 +39,11 @@ body{
 .message h2{
     font-size: 1.7rem;
     padding: 1rem 0;
+    background-color: rgb(71, 71, 71, 0.602);
 }
 
-.message button{
-    padding: 1rem;
-    font-weight: 400;
-    background-color: brown;
-    border-radius: 2rem;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    font-size: .9rem;
-    margin-top: 2rem;
-    transition: all .3s ease-in;
-    color:#fff;
-}
-
-.message button:hover {
-    background-color: #6464f8;
+.message p{
+    background-color: rgb(71, 71, 71, 0.602);
 }
 
 .formulario {
@@ -117,18 +104,3 @@ body{
     cursor: pointer;
 }
 
-.sign_in {
-    position: absolute;
-    opacity: 0;
-    visibility: hidden;
-}
-
-.sign_in.active {
-    opacity: 1;
-    visibility: visible;
-}
-
-.sign_up.active {
-    opacity: 0;
-    visibility: hidden;
-}
