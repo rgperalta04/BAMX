@@ -1,93 +1,136 @@
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config()
-  }
-  
-  const express = require('express')
-  const app = express()
-  const bcrypt = require('bcrypt')
-  const passport = require('passport')
-  const flash = require('express-flash')
-  const session = require('express-session')
-  const methodOverride = require('method-override')
-  
-  const initializePassport = require('./passport-config' )
-  initializePassport(
+}
+
+const express = require('express')
+const app = express()
+const bcrypt = require('bcrypt')
+const passport = require('passport')
+const flash = require('express-flash')
+const session = require('express-session')
+const methodOverride = require('method-override')
+const mysql = require('mysql')
+
+const initializePassport = require('./passport-config')
+initializePassport(
     passport,
-    email => users.find(user => user.email === email),
-    id => users.find(user => user.id === id)
-  )
-  
-  const users = []
-  
-  app.set('view-engine', 'ejs')
-  app.use(express.urlencoded({ extended: false }))
-  app.use(flash())
-  app.use(session({
+    async (email) => {
+        return new Promise((resolve, reject) => {
+            db.query('SELECT * FROM users WHERE email = ?', [email], (error, results) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(results[0]); // returns the first row found or undefined if no user is found
+                }
+            });
+        });
+    },
+    async (id) => {
+        return new Promise((resolve, reject) => {
+            db.query('SELECT * FROM users WHERE id = ?', [id], (error, results) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(results[0]); // returns the first row found or undefined if no user is found
+                }
+            });
+        });
+    }
+);
+
+
+app.set('view-engine', 'ejs')
+app.use(express.urlencoded({ extended: false }))
+app.use(flash())
+app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false
-  }))
-  app.use(passport.initialize())
-  app.use(passport.session())
-  app.use(methodOverride('_method'))
-  
-  app.get('/', checkAuthenticated, (req, res) => {
-    res.render('index.ejs', { name: req.user.name })
-  })
-  
-  app.get('/login', checkNotAuthenticated, (req, res) => {
-    res.render('login.ejs')
-  })
-  
-  app.post('/login', checkNotAuthenticated, passport.authenticate( 'local', {
+}))
+app.use(passport.initialize())
+app.use(passport.session())
+app.use(methodOverride('_method'))
+
+//////////////////////////////////////////////////////
+// CREACION DE BASE DE DATOS /////////////////////////
+//////////////////////////////////////////////////////
+const db = mysql.createConnection({
+  host: process.env.DATABASE_HOST,
+  user: process.env.DATABASE_USER,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE
+})
+
+db.connect((error)=>{
+  if(error){
+    console.log(error)
+  }else{
+    console.log("Conectado a Mysql..")
+  }
+})
+/////////////////////////////////////////////////////
+
+
+// DEFINIMOS LAS RUTAS (./Routes/pages.js)///////////
+app.use('/', require('./routes/pages'))
+app.use('/register', require('./routes/pages'))
+app.use('/login', require('./routes/pages'))
+
+
+app.post('/login', checkNotAuthenticated, passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/login',
     failureFlash: true
-  }))
-  
-  app.get('/register', checkNotAuthenticated, (req, res) => {
-    res.render('register.ejs')
-  })
-  
-  app.post('/register', checkNotAuthenticated, async (req, res) => {
+}))
+
+app.post('/register', checkNotAuthenticated, async (req, res) => {
     try {
-      const hashedPassword = await bcrypt.hash(req.body.password, 10)
-      users.push({
-        id: Date.now().toString(),
-        name: req.body.name,
-        email: req.body.email,
-        password: hashedPassword
-      })
-      res.redirect('/login')
+        const hashedPassword = await bcrypt.hash(req.body.password, 10)
+        const newUser = {
+            name: req.body.name,
+            email: req.body.email,
+            password: hashedPassword
+        }
+        // Insertar el nuevo usuario en la base de datos
+        db.query('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', 
+            [newUser.name, newUser.email, newUser.password],
+            (error, results) => {
+                if (error) {
+                    console.log(error);
+                    res.redirect('/register');
+                } else {
+                    res.redirect('/login');
+                }
+            });
     } catch {
-      res.redirect('/register')
+        res.redirect('/register');
     }
-  })
-  
-  app.delete('/logout', (req, res, next) => {
+});
+
+app.delete('/logout', (req, res, next) => {
     req.logOut((err) => {
-      if (err) {
-        return next(err);
-      }
-      res.redirect('/login' );
+        if (err) {
+            return next(err);
+        }
+        res.redirect('/login');
     });
-  });
-  
-  function checkAuthenticated(req, res, next) {
+});
+
+function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
-      return next()
+        return next()
     }
-  
+
     res.redirect('/login')
-  }
-  
-  function checkNotAuthenticated(req, res, next) {
+}
+
+function checkNotAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
-      return res.redirect('/')
+        return res.redirect('/')
     }
     next()
-  }
-  
+}
+
 app.listen(3000)
 
 app.use(express.static('public'))
