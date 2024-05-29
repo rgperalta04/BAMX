@@ -1,16 +1,8 @@
-# PROYECTO PARA EL BANCO DE ALIMENTOS DE HERMOSILLO
+# Dashboard sobre partidos internacionales entre 1872-2024
  
 ###  Descripción:
-Aplicación software que permita a sus usuarios capturar los datos requeridos sobre su vivienda y familia para aplicar al recibimiento de apoyo alimentario por parte de BAMX, y a los encargados del banco gestionar con mayor facilidad dichas aplicaciones al programa.
- 
-### Objetivo general:
-Desarrollar un software que haga más sencillo el proceso de aplicación al programa tanto a los aspirantes como a los encargados, mediante una plataforma en la que se puedan introducir los datos del aspirante y una base de datos en la que se almacenen para fácil acceso.
- 
-###  Objetivo específicos:
-- Desarrollar una plataforma en la que se puedan capturar los datos de acuerdo al formato de BAMX
-- Desarrollar una base de datos en la que se puedan almacenar los datos
-- Desarrollar un mapa de calor en el que se puedan visualizar las áreas con mayor densidad de apoyados
-- Permitir el sencillo y ordenado acceso a la información de los aspirantes para darlos de alta o baja
+Este es un proyecto utilizando javascript, node js y mysql crea un dashboard de una base de datos en donde se encuentran todos los resultados de partidos internacionales entre 1872-2024.
+La base se descargo de [aqui](https://www.kaggle.com/datasets/martj42/international-football-results-from-1872-to-2017)
 
 ###  Integrantes
 
