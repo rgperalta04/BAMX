@@ -15,7 +15,7 @@ La base se descargo de [aqui](https://www.kaggle.com/datasets/martj42/internatio
 
 3.Nodejs v20.12.2
 
-###Intstrucciones de uso:
+### Intstrucciones de uso:
 1.Utiliza el siguiente comando para clonar el repositorio:
 ```git clone https://github.com/rgperalta04/BAMX```
 2.Instala las dependias necesarias.
