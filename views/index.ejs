@@ -1,14 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/style.css">
     <title>Banco de alimentos de Mexico</title>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
+    <header>
+        <h2>Bienvenido/a, <%= name %></h2>
+        <form action="logOut?_method=DELETE" method="POST" class="logout-form">
+            <button type="submit">Cerrar sesión</button>
+        </form>
+    </header>
 
-    <h2>Bienvenido/a, <%= name %></h2>
-    <form action="logOut?_method=DELETE" method="POST">
-        <button type="submit"> Cerrar sesión</button>
-    </form>
+    <main>
+        <div class="sidebar">
+            <h3>Selecciona el tipo de gráfica</h3>
+            <form id="chartForm">
+                <select id="chartType" name="chartType">
+                    <option value="matchesByCity">Partidos por ciudad</option>
+                    <option value="commonResults">Resultados más comunes</option>
+                    <option value="commonMatches">Enfrentamientos más comunes</option>
+                </select>
+                <button type="submit">Generar Gráfica</button>
+            </form>
+        </div>
+
+        <div class="content">
+            <h3>Gráfica</h3>
+            <canvas id="myChart"></canvas>
+        </div>
+    </main>
+
+    <script>
+        // Plugin para agregar fondo a la gráfica
+        const backgroundPlugin = {
+            id: 'customCanvasBackgroundColor',
+            beforeDraw: (chart) => {
+                const ctx = chart.canvas.getContext('2d');
+                ctx.save();
+                ctx.globalCompositeOperation = 'destination-over';
+                ctx.fillStyle = '#f0f0f0'; // Color de fondo
+                ctx.fillRect(0, 0, chart.width, chart.height);
+                ctx.restore();
+            }
+        };
+
+        document.getElementById('chartForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const chartType = document.getElementById('chartType').value;
+            fetch(`/datos-fulbo?type=${chartType}`)
+                .then(response => response.json())
+                .then(data => {
+                    let labels, values;
+
+                    if (chartType === 'matchesByCity') {
+                        labels = data.map(item => item.city);
+                        values = data.map(item => item.count);
+                    } else if (chartType === 'commonResults') {
+                        labels = data.map(item => item.result);
+                        values = data.map(item => item.count);
+                    } else if (chartType === 'commonMatches') {
+                        labels = data.map(item => item.match_up);
+                        values = data.map(item => item.count);
+                    }
+
+                    const ctx = document.getElementById('myChart').getContext('2d');
+                    if (window.myChart && typeof window.myChart.destroy === 'function') {
+                        window.myChart.destroy();
+                    }
+                    window.myChart = new Chart(ctx, {
+                        type: 'bar',  // Cambia a tipo de gráfica de barras
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Número de partidos',
+                                data: values,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        },
+                        plugins: [backgroundPlugin]
+                    });
+                })
+                .catch(error => console.error('Error al obtener los datos:', error));
+        });
+    </script>
 </body>
+</html>
+
