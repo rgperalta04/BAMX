@@ -70,6 +70,78 @@ db.connect((error)=>{
 })
 /////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////
+// CONEXION A BASE DE DATOS fulbo ///////////
+//////////////////////////////////////////////////////
+const dbFulbo = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'fulbo'
+  })
+  
+  dbFulbo.connect((error)=>{
+    if(error){
+      console.log(error)
+    }else{
+      console.log("Conectado a fulbo...")
+    }
+  })
+
+// Nueva ruta para obtener los datos de la base de datos fulbo
+app.get('/datos-fulbo', (req, res) => {
+    const type = req.query.type;
+    let sql;
+
+    switch (type) {
+        case 'commonResults':
+            sql = `
+                SELECT 
+                    LEAST(home_score, away_score) AS min_score,
+                    GREATEST(home_score, away_score) AS max_score,
+                    CONCAT(LEAST(home_score, away_score), '-', GREATEST(home_score, away_score)) as result, 
+                    COUNT(*) as count
+                FROM results
+                GROUP BY min_score, max_score
+                ORDER BY count DESC
+                LIMIT 10
+            `;
+            break;
+        case 'commonMatches':
+            sql = `
+                SELECT 
+                    CONCAT(
+                        LEAST(home_team, away_team), 
+                        ' vs ', 
+                        GREATEST(home_team, away_team)
+                    ) as match_up, 
+                    COUNT(*) as count
+                FROM results
+                GROUP BY match_up
+                ORDER BY count DESC
+                LIMIT 10
+            `;
+            break;
+        case 'matchesByCity':
+        default:
+            sql = `
+                SELECT city, COUNT(*) as count
+                FROM results
+                GROUP BY city
+                ORDER BY count DESC
+                LIMIT 10
+            `;
+            break;
+    }
+
+    dbFulbo.query(sql, (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    });
+});
+
+
+
 
 // DEFINIMOS LAS RUTAS (./Routes/pages.js)///////////
 app.use('/', require('./routes/pages'))
