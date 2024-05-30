@@ -19,8 +19,8 @@ La base se descargo de [aqui](https://www.kaggle.com/datasets/martj42/internatio
 1.Utiliza el siguiente comando para clonar el repositorio:
 ```git clone https://github.com/rgperalta04/BAMX```
 
-2.Instala las dependias necesarias:
-```npm install``
+2.Instala las dependencias necesarias:
+```npm install```
 
 3.Crea un archivo '.env' en el directorio raiz del protecto, copia el contenido de 'env.example' al nuevo archivo y completa los valores necesarios
 
